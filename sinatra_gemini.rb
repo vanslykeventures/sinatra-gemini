@@ -13,7 +13,7 @@ class SinatraGemini
         region: 'us-central1'
       },
       options: {
-        model: 'gemini-1.5-flash-002'
+        model: 'gemini-2.5-flash'
       }
     )
 
@@ -29,17 +29,21 @@ class SinatraGemini
     end
 
     prompt = <<~PROMPT
-      Use the following data only.  Use no external knowledge, even things that may sound common.
-
+      Use the following data only.  Use no external knowledge, even things that may sound common or assumed. 
+      
       #{text_brain}
       #{pdf_brain}
-
+      
+      
+      Only respond in regards to the 'task' statement.  No others.
       #{task}
-
+      Organize your response in the format of \"The provided statement is true or false because of 'reason' \"
     PROMPT
 
-    gemini.generate_content(
+    response = gemini.generate_content(
       { contents: { role: 'user', parts: { text: prompt } } }
     )
+
+    response.dig("candidates", 0, "content", "parts", 0, "text")
   end
 end
