@@ -3,17 +3,28 @@ require "dotenv/load"
 require_relative 'sinatra_gemini'
 
 get '/' do
-  '<form action="/submit" method="post">
-     <input type="text" name="message" placeholder="Type something" />
-     <button type="submit">Send</button>
-   </form>'
+  erb :index
 end
 
 post '/submit' do
-  task = params[:message]
-  response = SinatraGemini.new.run(task)
+  response = SinatraGemini.new.run(payload)
 
   return "#{response}"
+end
+
+private 
+
+def payload
+  {
+    task: params[:message],
+    season: params[:season],
+    sport: params[:sport],
+    age: true_age
+  }
+end
+
+def true_age
+  params[:season] == 'spring' ? params[:spring_age] : params[:fall_age]
 end
 
 # TODO: #
