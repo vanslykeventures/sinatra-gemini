@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ump Bot</title>
+    <script>
+      function toggleAgeDropdown() {
+        // Hide all first
+        document.getElementById("spring_age_bb_group").style.display = "none";
+        document.getElementById("spring_age_sb_group").style.display = "none";
+        document.getElementById("fall_age_bb_group").style.display = "none";
+        document.getElementById("fall_age_sb_group").style.display = "none";
+        document.getElementById("spring_tb_group").style.display = "none";
+        document.getElementById("fall_tb_group").style.display = "none";
+
+        const seasonSpring = document.getElementById("season_spring").checked;
+        const seasonFall   = document.getElementById("season_fall").checked;
+
+        // Which sport is chosen?
+        const sportBaseball = document.querySelector('input[name="sport"][value="baseball"]').checked;
+        const sportSoftball = document.querySelector('input[name="sport"][value="softball"]').checked;
+        const sportTeeball  = document.querySelector('input[name="sport"][value="teeball"]').checked;
+
+        if (seasonSpring && sportBaseball) {
+          document.getElementById("spring_age_bb_group").style.display = "block";
+        } else if (seasonSpring && sportSoftball) {
+          document.getElementById("spring_age_sb_group").style.display = "block";
+        } else if (seasonSpring && sportTeeball) {
+          document.getElementById("spring_tb_group").style.display = "block";
+        } else if (seasonFall && sportBaseball) {
+          document.getElementById("fall_age_bb_group").style.display = "block";
+        } else if (seasonFall && sportSoftball) {
+          document.getElementById("fall_age_sb_group").style.display = "block";
+        } else if (seasonFall && sportTeeball) {
+          document.getElementById("fall_tb_group").style.display = "block";
+        }
+      }
+
+      function clearForm() {
+        document.getElementById("regForm").reset();
+        toggleAgeDropdown(); // Reset visibility
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Ump Bot</h1>
+    <form id="regForm" action="/submit" method="post">
+      <!-- Season radio buttons -->
+      <label><input type="radio" id="season_spring" name="season" value="spring" onclick="toggleAgeDropdown()"> Spring</label>
+      <label><input type="radio" id="season_fall" name="season" value="fall" onclick="toggleAgeDropdown()"> Fall</label>
+      <br><br>
+
+      <!-- Sport radio buttons -->
+      <label><input type="radio" name="sport" value="baseball" onclick="toggleAgeDropdown()"> Baseball</label>
+      <label><input type="radio" name="sport" value="softball" onclick="toggleAgeDropdown()"> Softball</label>
+      <label><input type="radio" name="sport" value="teeball" onclick="toggleAgeDropdown()"> Tee Ball</label>
+      <br><br>
+
+      <!-- Dropdown for Spring Tee Ball -->
+      <div id="spring_tb_group" style="display:none;">
+        <label for="spring_tb">Spring Tee Ball Age Group:</label>
+        <select name="spring_tb" id="spring_tb">
+          <option value="tb1">Tee Ball I</option>
+          <option value="tb2">Tee Ball II</option>
+        </select>
+      </div>
+
+      <!-- Dropdown for Fall Tee Ball -->
+      <div id="fall_tb_group" style="display:none;">
+        <label for="fall_tb">Fall Tee Ball Age Group:</label>
+        <select name="fall_tb" id="fall_tb">
+          <option value="tb3">Tee Ball</option>
+        </select>
+      </div>
+
+      <!-- Dropdown for Spring Baseball ages -->
+      <div id="spring_age_bb_group" style="display:none;">
+        <label for="spring_age_bb">Spring Baseball Age Group:</label>
+        <select name="spring_age_bb" id="spring_age_bb">
+          <option value="under8">Under 8</option>
+          <option value="under10">Under 10</option>
+          <option value="under12">Under 12</option>
+          <option value="under14">Under 14</option>
+          <option value="under18">Under 18</option>
+        </select>
+      </div>
+
+      <!-- Dropdown for Spring Softball ages -->
+      <div id="spring_age_sb_group" style="display:none;">
+        <label for="spring_age_sb">Spring Softball Age Group:</label>
+        <select name="spring_age_sb" id="spring_age_sb">
+          <option value="under8">Under 8</option>
+          <option value="under10">Under 10</option>
+          <option value="under12">Under 12</option>
+          <option value="under17">Under 17</option>
+        </select>
+      </div>
+
+      <!-- Dropdown for Fall Baseball ages -->
+      <div id="fall_age_bb_group" style="display:none;">
+        <label for="fall_age_bb">Fall Baseball Age Group:</label>
+        <select name="fall_age_bb" id="fall_age_bb">
+          <option value="under7">Under 7</option>
+          <option value="under9">Under 9</option>
+          <option value="under11">Under 11</option>
+          <option value="under13">Under 13</option>
+          <option value="under17">Under 17</option>
+        </select>
+      </div>
+
+      <!-- Dropdown for Fall Softball ages -->
+      <div id="fall_age_sb_group" style="display:none;">
+        <label for="fall_age_sb">Fall Softball Age Group:</label>
+        <select name="fall_age_sb" id="fall_age_sb">
+          <option value="under7">Under 7</option>
+          <option value="under9">Under 9</option>
+          <option value="under11">Under 11</option>
+          <option value="under16">Under 16</option>
+        </select>
+      </div>
+
+      <br>
+      <!-- Text input -->
+      <input type="text" name="message" placeholder="Type something" /><br><br>
+
+      <button type="submit">Send</button>
+      <button type="button" onclick="clearForm()">Clear</button>
+    </form>
+  </body>
+</html>
