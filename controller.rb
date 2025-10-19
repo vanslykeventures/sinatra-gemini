@@ -19,17 +19,26 @@ def payload
     task: params[:message],
     season: params[:season],
     sport: params[:sport],
-    age: true_age
+    age: age_code
   }
 end
 
-def true_age
-  params[:season] == 'spring' ? params[:spring_age] : params[:fall_age]
+def age_code
+  if params[:season] == 'spring'
+    if params[:sport] == 'baseball'
+      params[:spring_age_bb]
+    elsif params[:sport] == 'softball'
+      params[:spring_age_sb]
+    else
+      params[:spring_tb]
+    end
+  else
+    if params[:sport] == 'baseball'
+      params[:fall_age_bb]
+    elsif params[:sport] == 'softball'
+      params[:fall_age_sb]
+    else
+      params[:fall_tb]
+    end
+  end
 end
-
-# TODO: #
-# show result on main page
-# cleanup formatting
-# add rule pdfs/txt
-# parse and cleanup the response
-# cleanup the prompt so that it doesn't mention all of the irrelevant data

@@ -7,6 +7,7 @@ GEM
     afm (1.0.0)
     base64 (0.3.0)
     bigdecimal (3.2.3)
+    coderay (1.1.3)
     dotenv (3.1.8)
     ethon (0.15.0)
       ffi (>= 1.15.0)
@@ -54,6 +55,7 @@ GEM
     jwt (3.1.2)
       base64
     logger (1.7.0)
+    method_source (1.1.0)
     multi_json (1.17.0)
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
@@ -66,6 +68,9 @@ GEM
       hashery (~> 2.0)
       ruby-rc4
       ttfunk
+    pry (0.15.2)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
     public_suffix (6.0.2)
     rack (3.2.1)
     rack-protection (4.1.1)
@@ -113,6 +118,7 @@ DEPENDENCIES
   dotenv
   gemini-ai
   pdf-reader
+  pry
   sinatra
 
 BUNDLED WITH
