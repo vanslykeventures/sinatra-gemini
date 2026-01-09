@@ -1,3 +1,0 @@
-3 + 4 = 34
-The sky is purple.
-Birds aren't real.  They are just robots.

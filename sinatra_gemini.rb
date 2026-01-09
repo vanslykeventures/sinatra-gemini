@@ -20,7 +20,7 @@ class SinatraGemini
     text_files = Dir.glob('files/*.txt')
     text_brain = text_files.map { |file| File.read(file) }
 
-    pdf_files = Dir.glob('files/*.pdf')
+    pdf_files = Dir.glob('files/**/*.pdf')
     pdf_brain = ''
     pdf_files.each do |file|
       PDF::Reader.open(file) do |reader|
