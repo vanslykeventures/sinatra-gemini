@@ -7,6 +7,7 @@ GEM
     afm (1.0.0)
     base64 (0.3.0)
     bigdecimal (3.2.3)
+    connection_pool (3.0.2)
     dotenv (3.1.8)
     ethon (0.15.0)
       ffi (>= 1.15.0)
@@ -59,6 +60,7 @@ GEM
       ruby2_keywords (~> 0.0.1)
     net-http (0.6.0)
       uri
+    nio4r (2.7.5)
     os (1.1.4)
     pdf-reader (2.15.0)
       Ascii85 (>= 1.0, < 3.0, != 2.0.0)
@@ -67,6 +69,8 @@ GEM
       ruby-rc4
       ttfunk
     public_suffix (6.0.2)
+    puma (7.1.0)
+      nio4r (~> 2.0)
     rack (3.2.1)
     rack-protection (4.1.1)
       base64 (>= 0.1.0)
@@ -75,6 +79,13 @@ GEM
     rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
+    rackup (2.3.1)
+      rack (>= 3)
+    rake (13.3.1)
+    redis (5.4.1)
+      redis-client (>= 0.22.0)
+    redis-client (0.26.3)
+      connection_pool
     ruby-rc4 (0.1.5)
     ruby2_keywords (0.0.5)
     signet (0.21.0)
@@ -113,6 +124,10 @@ DEPENDENCIES
   dotenv
   gemini-ai
   pdf-reader
+  puma
+  rackup
+  rake
+  redis
   sinatra
 
 BUNDLED WITH

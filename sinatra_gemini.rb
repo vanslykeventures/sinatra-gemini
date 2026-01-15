@@ -2,11 +2,19 @@
 require 'sinatra'
 require 'gemini-ai'
 require 'pdf-reader'
+require 'redis'
 require "dotenv/load"
 
 class SinatraGemini
+  def refresh_pdf_cache!
+    redis = redis_client
+    clear_pdf_cache(redis)
+    warm_pdf_cache(redis)
+  end
+
   def run(task)
     context = extract_context(task)
+    redis = redis_client
 
     gemini = Gemini.new(
       credentials: {
@@ -25,9 +33,7 @@ class SinatraGemini
     pdf_files = select_pdf_files(context)
     pdf_brain = ''
     pdf_files.each do |file|
-      PDF::Reader.open(file) do |reader|
-        reader.pages.each { |page| pdf_brain += page.text }
-      end
+      pdf_brain += fetch_pdf_text(file, redis)
     end
 
     prompt = <<~PROMPT
@@ -36,10 +42,9 @@ class SinatraGemini
       #{text_brain}
       #{pdf_brain}
       
-      
       Only respond in regards to the 'task' statement.  No others.
       #{task}
-      Organize your response in the format of \"The provided statement is true or false because of 'reason' \"
+      Organize your response in the format of \"The provided statement is true or false because of 'reason' \.  Always include and attribute to the referenced rule."
     PROMPT
 
     response = gemini.generate_content(
@@ -59,6 +64,44 @@ class SinatraGemini
       teeball_level: normalize_teeball_level(extract_field(task, 'Tee Ball Level')),
       question: extract_field(task, 'Question')
     }.merge(raw_task: task)
+  end
+
+  def redis_client
+    Redis.new(url: ENV.fetch('REDIS_URL', 'redis://localhost:6379/0'))
+  end
+
+  def fetch_pdf_text(file, redis)
+    cache_key = pdf_cache_key(file)
+    cached = redis.get(cache_key)
+    return cached if cached
+
+    text = +''
+    PDF::Reader.open(file) do |reader|
+      reader.pages.each { |page| text << page.text }
+    end
+
+    redis.set(cache_key, text)
+    text
+  end
+
+  def warm_pdf_cache(redis)
+    Dir.glob('files/**/*.pdf').each do |file|
+      fetch_pdf_text(file, redis)
+    end
+  end
+
+  def clear_pdf_cache(redis)
+    cursor = "0"
+    loop do
+      cursor, keys = redis.scan(cursor, match: "sinatra_gemini:pdf:*", count: 500)
+      redis.del(*keys) unless keys.empty?
+      break if cursor == "0"
+    end
+  end
+
+  def pdf_cache_key(file)
+    mtime = File.mtime(file).to_i
+    "sinatra_gemini:pdf:#{file}:#{mtime}"
   end
 
   def extract_field(task, label)
