@@ -4,146 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>UmpBot</title>
-    <style>
-      :root {
-        color-scheme: light;
-        --ink: #111111;
-        --line: #9c9c9c;
-        --soft-line: #c8c8c8;
-        --paper: #ffffff;
-        --page: #f4f4f4;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        background: var(--page);
-        color: var(--ink);
-        font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-          "Lucida Sans", Arial, sans-serif;
-      }
-
-      .page {
-        min-height: 100vh;
-        padding: 28px 24px 40px;
-      }
-
-      .card {
-        max-width: 560px;
-        background: var(--paper);
-        border: 2px solid var(--line);
-        padding: 28px 34px 40px;
-      }
-
-      h1 {
-        margin: 0 0 18px;
-        font-size: 28px;
-        font-weight: 700;
-      }
-
-      form {
-        display: grid;
-        gap: 18px;
-      }
-
-      fieldset {
-        border: 1px solid var(--line);
-        padding: 12px 14px 14px;
-        margin: 0;
-      }
-
-      legend {
-        font-size: 14px;
-        padding: 0 6px;
-      }
-
-      .field-row {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-      }
-
-      .field-row > span,
-      .field-row > label {
-        min-width: 84px;
-      }
-
-      .radio-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px;
-      }
-
-      .radio-group label {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .field-row.stack {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
-      }
-
-      .helper {
-        font-size: 12px;
-        color: #555555;
-      }
-
-      .hidden {
-        display: none;
-      }
-
-      select {
-        border: 1px solid var(--soft-line);
-        padding: 4px 6px;
-        font-size: 14px;
-        background: #fff;
-      }
-
-      textarea {
-        width: 100%;
-        min-height: 140px;
-        border: 1px solid var(--soft-line);
-        padding: 6px 8px;
-        font-size: 14px;
-        font-family: inherit;
-        resize: vertical;
-      }
-
-      button {
-        width: fit-content;
-        padding: 4px 10px;
-        border: 1px solid var(--line);
-        background: #f7f7f7;
-        cursor: pointer;
-      }
-
-      button:hover {
-        background: #ededed;
-      }
-
-      @media (max-width: 640px) {
-        .card {
-          padding: 22px 20px 32px;
-        }
-
-        .field-row {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
   </head>
   <body>
+    <div class="loading-overlay" id="loading">
+      <div class="spinner" aria-hidden="true"></div>
+    </div>
     <div class="page">
       <div class="card">
         <h1>UmpBot</h1>
-        <form action="/submit" method="post">
+        <form id="umpbot_form" action="/submit" method="post">
           <fieldset>
             <legend>Select the season:</legend>
             <div class="field-row">
@@ -217,87 +88,17 @@
             </div>
           </fieldset>
 
-          <button type="submit">Submit</button>
+          <div class="button-row">
+            <button type="submit">Submit</button>
+            <button type="button" id="clear_form">Clear</button>
+          </div>
         </form>
+        <br>
+        <div class="hidden" id="result_card">
+          <h1>Result</h1>
+          <div id="result" class="result-box"></div>
+        </div>
       </div>
     </div>
-    <script>
-      const ageOptions = {
-        fall: {
-          baseball: ["U7", "U9", "U11", "U13", "17U"],
-          softball: ["U7", "U9", "U11", "U16"],
-          "tee ball": [],
-        },
-        spring: {
-          baseball: ["U8", "U10", "U12", "U14", "U18"],
-          softball: ["U8", "U10", "U12", "U17"],
-          "tee ball": [],
-        },
-      };
-
-      const seasonGroup = document.getElementById("season");
-      const sportGroup = document.getElementById("sport");
-      const ageRangeFieldset = document.getElementById("age_range_fieldset");
-      const ageSelect = document.getElementById("age_range");
-      const ageHelp = document.getElementById("age_help");
-      const teeballLevelFieldset = document.getElementById("teeball_level_fieldset");
-
-      const selectedValue = (groupName) => {
-        const checked = document.querySelector(`input[name="${groupName}"]:checked`);
-        return checked ? checked.value : "";
-      };
-
-      const buildAgeOptions = () => {
-        const season = selectedValue("season");
-        const sport = selectedValue("sport");
-        const ages = ageOptions[season]?.[sport] || [];
-        const showTeeballLevel = season === "spring" && sport === "tee ball";
-        const hasSelection = season && sport;
-
-        ageSelect.innerHTML = "";
-        if (!hasSelection) {
-          ageRangeFieldset.classList.add("hidden");
-          teeballLevelFieldset.classList.add("hidden");
-          return;
-        }
-
-        if (ages.length === 0) {
-          const option = document.createElement("option");
-          option.value = "";
-          option.textContent = "No age ranges for this selection";
-          option.disabled = true;
-          option.selected = true;
-          ageSelect.append(option);
-          ageSelect.disabled = true;
-          ageHelp.textContent = "This selection does not have age-specific rules.";
-          ageRangeFieldset.classList.toggle("hidden", showTeeballLevel);
-          teeballLevelFieldset.classList.toggle("hidden", !showTeeballLevel);
-          return;
-        }
-
-        const placeholder = document.createElement("option");
-        placeholder.value = "";
-        placeholder.textContent = "Select age range";
-        placeholder.disabled = true;
-        placeholder.selected = true;
-        ageSelect.append(placeholder);
-
-        ages.forEach((age) => {
-          const option = document.createElement("option");
-          option.value = age;
-          option.textContent = age;
-          ageSelect.append(option);
-        });
-
-        ageSelect.disabled = false;
-        ageHelp.textContent = "";
-        ageRangeFieldset.classList.remove("hidden");
-        teeballLevelFieldset.classList.add("hidden");
-      };
-
-      seasonGroup.addEventListener("change", buildAgeOptions);
-      sportGroup.addEventListener("change", buildAgeOptions);
-      buildAgeOptions();
-    </script>
   </body>
 </html>
